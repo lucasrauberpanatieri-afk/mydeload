@@ -16,54 +16,56 @@
     <div id="tab-ciclo" class="tab-content active p-6 max-w-md mx-auto">
         <h1 class="text-3xl font-black text-slate-900 mb-6">Meu Ciclo</h1>
         <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-            <span id="week-tag" class="text-xs font-bold uppercase px-2 py-1 bg-blue-100 text-blue-700 rounded">Carga</span>
-            <h2 id="week-title" class="text-5xl font-black my-4 text-slate-800">Semana 1</h2>
-            <button onclick="nextWeek()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold active:scale-95 transition-transform">
+            <span id="week-tag" class="text-xs font-bold uppercase px-2 py-1 bg-blue-100 text-blue-700 rounded text-center inline-block mb-2">Carga</span>
+            <h2 id="week-title" class="text-5xl font-black mb-4 text-slate-800">Semana 1</h2>
+            
+            <button onclick="nextWeek()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold active:scale-95 transition-transform mb-6">
                 Próxima Semana
             </button>
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden mt-6">
-            <div class="p-4 border-b border-slate-50">
-                <h3 class="font-bold text-slate-700 text-sm">Checklist de Hoje</h3>
-            </div>
-            <div id="days-list" class="divide-y divide-slate-50">
+
+            <div class="bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden">
+                <div class="p-4 border-b border-slate-200 bg-white">
+                    <h3 class="font-bold text-slate-700 text-sm">Checklist de Hoje</h3>
                 </div>
-        </div>
+                <div id="days-list" class="divide-y divide-slate-100">
+                    </div>
+            </div>
         </div>
     </div>
 
     <div id="tab-historico" class="tab-content p-6 max-w-md mx-auto">
         <h1 class="text-3xl font-black text-slate-900 mb-6">Histórico</h1>
         <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-            <p class="text-slate-500 text-center">Calendário em breve...</p>
+            <p class="text-slate-500 text-center italic">Calendário em breve...</p>
         </div>
     </div>
 
-<div id="tab-ajustes" class="tab-content p-6 max-w-md mx-auto">
+    <div id="tab-ajustes" class="tab-content p-6 max-w-md mx-auto">
         <h1 class="text-3xl font-black text-slate-900 mb-6">Ajustes</h1>
         <div class="space-y-4">
-            <div class="bg-white rounded-2xl p-4 border border-slate-100 flex items-center justify-between">
+            <div class="bg-white rounded-2xl p-4 border border-slate-100 flex items-center justify-between shadow-sm">
                 <div>
-                    <h4 class="font-bold text-sm text-slate-700">Ciclo de Deload</h4>
-                    <p class="text-[10px] text-slate-400 uppercase font-bold">Semanas de carga : 1 deload</p>
+                    <h4 class="font-bold text-sm">Semanas de Carga</h4>
+                    <p class="text-[10px] text-slate-500 uppercase font-bold">Antes do Deload</p>
                 </div>
-                <select onchange="updateRatio(this.value)" id="ratio-select" class="bg-slate-50 rounded-xl p-2 text-sm font-bold text-blue-600 outline-none border-none">
-                    <option value="2">2 para 1</option>
-                    <option value="3">3 para 1</option>
-                    <option value="4">4 para 1</option>
-                    <option value="5">5 para 1</option>
-                    <option value="6">6 para 1</option>
-                    <option value="7">7 para 1</option>
-                    <option value="8">8 para 1</option>
+                <select onchange="updateRatio(this.value)" id="ratio-select" class="bg-slate-50 border-none rounded-xl p-2 text-sm font-bold text-blue-600 outline-none">
+                    <option value="2">2 semanas</option>
+                    <option value="3">3 semanas</option>
+                    <option value="4">4 semanas</option>
+                    <option value="5">5 semanas</option>
+                    <option value="6">6 semanas</option>
+                    <option value="7">7 semanas</option>
+                    <option value="8">8 semanas</option>
                 </select>
             </div>
-            
+
             <button onclick="resetApp()" class="w-full py-4 bg-red-50 text-red-600 rounded-2xl font-bold border border-red-100 active:scale-95 transition-transform">
-                Resetar Ciclo
+                Resetar Ciclo Total
             </button>
         </div>
     </div>
 
-<nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 h-20 flex justify-around items-center z-50">
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 h-20 flex justify-around items-center z-50">
         <button onclick="switchTab('ciclo')" id="nav-ciclo" class="nav-item active flex flex-col items-center gap-1 text-blue-600">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
             <span class="text-[9px] font-bold uppercase">Ciclo</span>
@@ -80,126 +82,119 @@
 
     <script>
         // 1. ESTADO INICIAL
-        // Tenta carregar os dados IMEDIATAMENTE antes de qualquer coisa
-let savedData = localStorage.getItem('mydeload_v2');
+        let savedData = localStorage.getItem('mydeload_v2');
         let state = savedData ? JSON.parse(savedData) : {
             currentWeek: 1,
             deloadRatio: 4,
-            history: {} // Adicione isso se não houver
+            history: {}
         };
 
         // 2. FUNÇÃO DE TROCA DE ABAS
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => {
-                n.classList.remove('active');
+                n.classList.remove('active', 'text-blue-600');
                 n.classList.add('text-slate-400');
             });
-
-            const selectedTab = document.getElementById('tab-' + tabId);
-            const selectedNav = document.getElementById('nav-' + tabId);
-            
-            if (selectedTab && selectedNav) {
-                selectedTab.classList.add('active');
-                selectedNav.classList.add('active');
-                selectedNav.classList.remove('text-slate-400');
+            const selTab = document.getElementById('tab-' + tabId);
+            const selNav = document.getElementById('nav-' + tabId);
+            if (selTab && selNav) {
+                selTab.classList.add('active');
+                selNav.classList.add('active', 'text-blue-600');
+                selNav.classList.remove('text-slate-400');
             }
         }
 
-        // 3. FUNÇÃO DE AVANÇAR SEMANA
+        // 3. AVANÇAR SEMANA
         function nextWeek() {
             state.currentWeek++;
             if (state.currentWeek > (state.deloadRatio + 1)) {
                 state.currentWeek = 1;
             }
-            // Salva o novo estado
-            localStorage.setItem('mydeload_v2', JSON.stringify(state)); 
-            render();
+            save();
         }
 
-        // 4. FUNÇÃO DE RESETAR
-        function resetApp() {
-            if(confirm("Deseja resetar todos os dados?")) {
-                state.currentWeek = 1;
-                localStorage.setItem('mydeload_v2', JSON.stringify(state));
-                render();
-            }
-        }
-
-        // 5. Função para mudar a proporção do ciclo
+        // 4. MUDAR PROPORÇÃO
         function updateRatio(val) {
             state.deloadRatio = parseInt(val);
-            localStorage.setItem('mydeload_v2', JSON.stringify(state));
-            render();
+            save();
         }
 
-        // 6. Função para marcar/desmarcar treino hoje
+        // 5. MARCAR TREINO HOJE
         function toggleToday() {
-            const today = new Date();
-            const dateKey = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
+            const now = new Date();
+            const key = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+            if (!state.history) state.history = {};
             
-            if (state.history[dateKey]) {
-                delete state.history[dateKey];
+            if (state.history[key]) {
+                delete state.history[key];
             } else {
-                state.history[dateKey] = state.currentWeek;
+                state.history[key] = state.currentWeek;
             }
-            
+            save();
+        }
+
+        // 6. RESETAR
+        function resetApp() {
+            if(confirm("Deseja resetar todo o progresso?")) {
+                state.currentWeek = 1;
+                state.history = {};
+                save();
+            }
+        }
+
+        // 7. SALVAR E ATUALIZAR
+        function save() {
             localStorage.setItem('mydeload_v2', JSON.stringify(state));
             render();
         }
-        
-        // 7. FUNÇÃO DE RENDERIZAR (Atualizar a tela)
-function render() {
-            const weekTitle = document.getElementById('week-title');
-            const weekTag = document.getElementById('week-tag');
-            const ratioSelect = document.getElementById('ratio-select');
-            
-            // 1. Atualiza os textos da Semana
-            if (weekTitle && weekTag) {
-                const isDeload = state.currentWeek > state.deloadRatio;
-                weekTitle.innerText = "Semana " + state.currentWeek;
-                
-                weekTag.innerText = isDeload ? "Deload" : "Carga";
-                weekTag.className = isDeload 
-                    ? "text-xs font-bold uppercase px-2 py-1 bg-amber-100 text-amber-700 rounded"
-                    : "text-xs font-bold uppercase px-2 py-1 bg-blue-100 text-blue-700 rounded";
-            }
-            
-            // 2. Atualiza o Seletor nos Ajustes para mostrar o número salvo
-            if (ratioSelect) {
-                ratioSelect.value = state.deloadRatio;
-            }
 
-    // 3. Desenha o Checklist
+        // 8. DESENHAR TELA
+        function render() {
+            const isDeload = state.currentWeek > state.deloadRatio;
+            
+            // Semana e Tag
+            document.getElementById('week-title').innerText = "Semana " + state.currentWeek;
+            const tag = document.getElementById('week-tag');
+            tag.innerText = isDeload ? "Deload" : "Carga";
+            tag.className = isDeload 
+                ? "text-xs font-bold uppercase px-2 py-1 bg-amber-100 text-amber-700 rounded"
+                : "text-xs font-bold uppercase px-2 py-1 bg-blue-100 text-blue-700 rounded";
+
+            // Seletor
+            document.getElementById('ratio-select').value = state.deloadRatio;
+
+            // Checklist
             const list = document.getElementById('days-list');
-            if (list) {
-                const days = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
-                const today = new Date();
-                const todayIdx = (today.getDay() + 6) % 7; // Ajusta para começar na Segunda
-                const dateKey = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
-                const hasTrained = !!state.history[dateKey];
-                const isDeload = state.currentWeek > state.deloadRatio;
+            const days = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+            const now = new Date();
+            const todayIdx = (now.getDay() + 6) % 7;
+            const key = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+            const trained = state.history && state.history[key];
 
-                list.innerHTML = '';
-                days.forEach((day, i) => {
-                    const isToday = i === todayIdx;
-                    const row = document.createElement('div');
-                    row.className = `flex items-center justify-between p-4 ${!isToday ? 'opacity-30' : ''}`;
-                    row.innerHTML = `
-                        <div class="flex items-center gap-3">
-                            <button onclick="${isToday ? 'toggleToday()' : ''}" class="w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${isToday && hasTrained ? (isDeload ? 'bg-amber-500 border-amber-500' : 'bg-blue-600 border-blue-600') : 'border-slate-200'}">
-                                ${isToday && hasTrained ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4"><path d="M20 6 9 17l-5-5"/></svg>' : ''}
-                            </button>
-                            <span class="font-semibold text-sm ${isToday && hasTrained ? 'text-slate-400 line-through' : 'text-slate-700'}">${day}</span>
-                        </div>
-                        ${isToday ? '<span class="text-[10px] font-bold text-blue-500 uppercase">Hoje</span>' : ''}
-                    `;
-                    list.appendChild(row);
-                });
-            }
+            list.innerHTML = '';
+            days.forEach((day, i) => {
+                const isToday = i === todayIdx;
+                const div = document.createElement('div');
+                div.className = `flex items-center justify-between p-4 ${!isToday ? 'opacity-30' : ''}`;
+                
+                const colorClass = isDeload ? 'bg-amber-500 border-amber-500' : 'bg-blue-600 border-blue-600';
+                
+                div.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <button onclick="${isToday ? 'toggleToday()' : ''}" 
+                                class="w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all 
+                                ${isToday && trained ? colorClass : 'border-slate-200'}">
+                            ${isToday && trained ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4"><path d="M20 6 9 17l-5-5"/></svg>' : ''}
+                        </button>
+                        <span class="font-semibold text-sm ${isToday && trained ? 'text-slate-400 line-through' : 'text-slate-700'}">${day}</span>
+                    </div>
+                    ${isToday ? '<span class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Hoje</span>' : ''}
+                `;
+                list.appendChild(div);
+            });
         }
 
-        // 8. INICIALIZAÇÃO
         document.addEventListener('DOMContentLoaded', render);
     </script>
 </body>
