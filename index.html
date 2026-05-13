@@ -31,11 +31,25 @@
         </div>
     </div>
 
-    <div id="tab-ajustes" class="tab-content p-6 max-w-md mx-auto">
+<div id="tab-ajustes" class="tab-content p-6 max-w-md mx-auto">
         <h1 class="text-3xl font-black text-slate-900 mb-6">Ajustes</h1>
         <div class="space-y-4">
-            <button onclick="resetApp()" class="w-full py-4 bg-red-50 text-red-600 rounded-2xl font-bold border border-red-100">
-                Limpar Tudo
+            <div class="bg-white rounded-2xl p-4 border border-slate-100 flex items-center justify-between">
+                <div>
+                    <h4 class="font-bold text-sm text-slate-700">Ciclo de Deload</h4>
+                    <p class="text-[10px] text-slate-400 uppercase font-bold">Semanas de carga : 1 deload</p>
+                </div>
+                <select onchange="updateRatio(this.value)" id="ratio-select" class="bg-slate-50 rounded-xl p-2 text-sm font-bold text-blue-600 outline-none border-none">
+                    <option value="2">2 para 1</option>
+                    <option value="3">3 para 1</option>
+                    <option value="4">4 para 1</option>
+                    <option value="5">5 para 1</option>
+                    <option value="6">6 para 1</option>
+                </select>
+            </div>
+            
+            <button onclick="resetApp()" class="w-full py-4 bg-red-50 text-red-600 rounded-2xl font-bold border border-red-100 active:scale-95 transition-transform">
+                Resetar Ciclo
             </button>
         </div>
     </div>
@@ -102,23 +116,37 @@
             }
         }
 
-        // 5. FUNÇÃO DE RENDERIZAR (Atualizar a tela)
-        function render() {
+        // 5. Função para mudar a proporção do ciclo
+        function updateRatio(val) {
+            state.deloadRatio = parseInt(val);
+            localStorage.setItem('mydeload_v2', JSON.stringify(state));
+            render();
+        }
+
+        // 6. FUNÇÃO DE RENDERIZAR (Atualizar a tela)
+function render() {
             const weekTitle = document.getElementById('week-title');
             const weekTag = document.getElementById('week-tag');
+            const ratioSelect = document.getElementById('ratio-select');
             
+            // 1. Atualiza os textos da Semana
             if (weekTitle && weekTag) {
-                weekTitle.innerText = "Semana " + state.currentWeek;
                 const isDeload = state.currentWeek > state.deloadRatio;
+                weekTitle.innerText = "Semana " + state.currentWeek;
                 
                 weekTag.innerText = isDeload ? "Deload" : "Carga";
                 weekTag.className = isDeload 
                     ? "text-xs font-bold uppercase px-2 py-1 bg-amber-100 text-amber-700 rounded"
                     : "text-xs font-bold uppercase px-2 py-1 bg-blue-100 text-blue-700 rounded";
             }
+            
+            // 2. Atualiza o Seletor nos Ajustes para mostrar o número salvo
+            if (ratioSelect) {
+                ratioSelect.value = state.deloadRatio;
+            }
         }
 
-        // 6. INICIALIZAÇÃO
+        // 7. INICIALIZAÇÃO
         document.addEventListener('DOMContentLoaded', render);
     </script>
 </body>
