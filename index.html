@@ -53,23 +53,22 @@
     </nav>
 
     <script>
-        // Estado inicial
-        let state = {
+        // 1. ESTADO INICIAL
+        // Tenta carregar os dados IMEDIATAMENTE antes de qualquer coisa
+        let saved = localStorage.getItem('mydeload_v2');
+        let state = saved ? JSON.parse(saved) : {
             currentWeek: 1,
             deloadRatio: 4
         };
 
-        // Função para trocar de abas
+        // 2. FUNÇÃO DE TROCA DE ABAS
         function switchTab(tabId) {
-            // Esconde todas as abas
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            // Reseta cores dos botões
             document.querySelectorAll('.nav-item').forEach(n => {
                 n.classList.remove('active');
                 n.classList.add('text-slate-400');
             });
 
-            // Mostra a aba selecionada
             const selectedTab = document.getElementById('tab-' + tabId);
             const selectedNav = document.getElementById('nav-' + tabId);
             
@@ -80,50 +79,28 @@
             }
         }
 
-        // Função para avançar semana
-       // Função para avançar semana e SALVAR
+        // 3. FUNÇÃO DE AVANÇAR SEMANA
         function nextWeek() {
             state.currentWeek++;
             if (state.currentWeek > (state.deloadRatio + 1)) {
                 state.currentWeek = 1;
             }
-            // Esse comando grava o dado no celular:
+            // Salva o novo estado
             localStorage.setItem('mydeload_v2', JSON.stringify(state)); 
-            updateUI();
+            render();
         }
 
-        // Atualiza a tela e também CARREGA os dados ao abrir
-        function updateUI() {
-            // Tenta carregar o que foi salvo antes
-            const saved = localStorage.getItem('mydeload_v2');
-            if (saved) {
-                state = JSON.parse(saved);
-            }
-
-            const weekTitle = document.getElementById('week-title');
-            const weekTag = document.getElementById('week-tag');
-            
-            if (weekTitle && weekTag) {
-                weekTitle.innerText = "Semana " + state.currentWeek;
-                const isDeload = state.currentWeek > state.deloadRatio;
-                
-                weekTag.innerText = isDeload ? "Deload" : "Carga";
-                weekTag.className = isDeload 
-                    ? "text-xs font-bold uppercase px-2 py-1 bg-amber-100 text-amber-700 rounded"
-                    : "text-xs font-bold uppercase px-2 py-1 bg-blue-100 text-blue-700 rounded";
-            }
-        }
-
-        // Função para resetar
+        // 4. FUNÇÃO DE RESETAR
         function resetApp() {
             if(confirm("Deseja resetar todos os dados?")) {
                 state.currentWeek = 1;
-                updateUI();
+                localStorage.setItem('mydeload_v2', JSON.stringify(state));
+                render();
             }
         }
 
-        // Atualiza a tela
-        function updateUI() {
+        // 5. FUNÇÃO DE RENDERIZAR (Atualizar a tela)
+        function render() {
             const weekTitle = document.getElementById('week-title');
             const weekTag = document.getElementById('week-tag');
             
@@ -138,8 +115,8 @@
             }
         }
 
-        // Inicia o app
-        document.addEventListener('DOMContentLoaded', updateUI);
+        // 6. INICIALIZAÇÃO
+        document.addEventListener('DOMContentLoaded', render);
     </script>
 </body>
 </html>
