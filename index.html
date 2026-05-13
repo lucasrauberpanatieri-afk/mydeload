@@ -34,7 +34,7 @@
     </div>
 
     <div id="tab-historico" class="tab-content p-6 max-w-md mx-auto">
-<h1 class="text-3xl font-black text-slate-900 mb-6">Histórico</h1>
+        <h1 class="text-3xl font-black text-slate-900 mb-6">Histórico</h1>
         <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
             <div class="flex justify-between items-center mb-6">
                 <h3 id="month-name" class="font-bold text-slate-800 capitalize">Mês</h3>
@@ -66,6 +66,7 @@
                 </div>
             </div>
         </div>
+    </div>
 
     <div id="tab-ajustes" class="tab-content p-6 max-w-md mx-auto">
         <h1 class="text-3xl font-black text-slate-900 mb-6">Ajustes</h1>
@@ -93,183 +94,9 @@
     </div>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 h-20 flex justify-around items-center z-50">
-        <button onclick="switchTab('ciclo')" id="nav-ciclo" class="nav-item active flex flex-col items-center gap-1 text-blue-600">
+        <button onclick="switchTab('ciclo')" id="nav-ciclo" class="nav-item active flex flex-col items-center gap-1">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
             <span class="text-[9px] font-bold uppercase">Ciclo</span>
         </button>
         <button onclick="switchTab('historico')" id="nav-historico" class="nav-item text-slate-400 flex flex-col items-center gap-1">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            <span class="text-[9px] font-bold uppercase">Histórico</span>
-        </button>
-        <button onclick="switchTab('ajustes')" id="nav-ajustes" class="nav-item text-slate-400 flex flex-col items-center gap-1">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-            <span class="text-[9px] font-bold uppercase">Ajustes</span>
-        </button>
-    </nav>
-
-    <script>
-        // 1. ESTADO INICIAL
-        let savedData = localStorage.getItem('mydeload_v2');
-        let state = savedData ? JSON.parse(savedData) : {
-            currentWeek: 1,
-            deloadRatio: 4,
-            history: {}
-        };
-
-        // 2. FUNÇÃO DE TROCA DE ABAS
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => {
-                n.classList.remove('active', 'text-blue-600');
-                n.classList.add('text-slate-400');
-            });
-            const selTab = document.getElementById('tab-' + tabId);
-            const selNav = document.getElementById('nav-' + tabId);
-            if (selTab && selNav) {
-                selTab.classList.add('active');
-                selNav.classList.add('active', 'text-blue-600');
-                selNav.classList.remove('text-slate-400');
-            }
-        }
-
-        // 3. AVANÇAR SEMANA
-        function nextWeek() {
-            state.currentWeek++;
-            if (state.currentWeek > (state.deloadRatio + 1)) {
-                state.currentWeek = 1;
-            }
-            save();
-        }
-
-        // 4. MUDAR PROPORÇÃO
-        function updateRatio(val) {
-            state.deloadRatio = parseInt(val);
-            save();
-        }
-
-        // 5. MARCAR TREINO HOJE
-        function toggleToday() {
-            const now = new Date();
-            const key = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
-            if (!state.history) state.history = {};
-            
-            if (state.history[key]) {
-                delete state.history[key];
-            } else {
-                state.history[key] = state.currentWeek;
-            }
-            save();
-        }
-
-        // 6. RESETAR
-        function resetApp() {
-            if(confirm("Deseja resetar todo o progresso?")) {
-                state.currentWeek = 1;
-                state.history = {};
-                save();
-            }
-        }
-
-        // 7. SALVAR E ATUALIZAR
-        function save() {
-            localStorage.setItem('mydeload_v2', JSON.stringify(state));
-            render();
-        }
-
-        // 8. DESENHAR TELA
-        let currentViewDate = new Date();
-
-        function changeMonth(dir) {
-            currentViewDate.setMonth(currentViewDate.getMonth() + dir);
-            render();
-        }
-
-        function drawCalendar() {
-            const grid = document.getElementById('calendar-grid');
-            const monthName = document.getElementById('month-name');
-            if (!grid || !monthName) return;
-
-            const year = currentViewDate.getFullYear();
-            const month = currentViewDate.getMonth();
-            
-            monthName.innerText = new Intl.DateTimeFormat('pt-br', { month: 'long', year: 'numeric' }).format(currentViewDate);
-
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-            grid.innerHTML = '';
-
-            // Espaços vazios
-            for (let i = 0; i < firstDay; i++) {
-                grid.appendChild(document.createElement('div'));
-            }
-
-            // Dias do mês
-            for (let d = 1; d <= daysInMonth; d++) {
-                const dayDiv = document.createElement('div');
-                const dateKey = `${year}-${month}-${d}`;
-                const trainedInWeek = state.history[dateKey]; // Retorna a semana do treino
-
-                dayDiv.className = `aspect-square flex items-center justify-center text-xs font-bold rounded-xl transition-all`;
-                dayDiv.innerText = d;
-
-                if (trainedInWeek) {
-                    // Se a semana gravada no histórico for maior que o ratio, é amarelo (deload)
-                    const wasDeload = trainedInWeek > state.deloadRatio;
-                    dayDiv.className += wasDeload ? ' bg-amber-500 text-white shadow-lg shadow-amber-200' : ' bg-blue-600 text-white shadow-lg shadow-blue-200';
-                } else {
-                    dayDiv.className += ' text-slate-400 hover:bg-slate-50';
-                }
-                grid.appendChild(dayDiv);
-            }
-        }
-        function render() {
-            const isDeload = state.currentWeek > state.deloadRatio;
-            
-            // Semana e Tag
-            document.getElementById('week-title').innerText = "Semana " + state.currentWeek;
-            const tag = document.getElementById('week-tag');
-            tag.innerText = isDeload ? "Deload" : "Carga";
-            tag.className = isDeload 
-                ? "text-xs font-bold uppercase px-2 py-1 bg-amber-100 text-amber-700 rounded"
-                : "text-xs font-bold uppercase px-2 py-1 bg-blue-100 text-blue-700 rounded";
-
-            // Seletor
-            document.getElementById('ratio-select').value = state.deloadRatio;
-
-            // Checklist
-            const list = document.getElementById('days-list');
-            const days = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
-            const now = new Date();
-            const todayIdx = (now.getDay() + 6) % 7;
-            const key = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
-            const trained = state.history && state.history[key];
-
-            list.innerHTML = '';
-            days.forEach((day, i) => {
-                const isToday = i === todayIdx;
-                const div = document.createElement('div');
-                div.className = `flex items-center justify-between p-4 ${!isToday ? 'opacity-30' : ''}`;
-                
-                const colorClass = isDeload ? 'bg-amber-500 border-amber-500' : 'bg-blue-600 border-blue-600';
-                
-                div.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <button onclick="${isToday ? 'toggleToday()' : ''}" 
-                                class="w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all 
-                                ${isToday && trained ? colorClass : 'border-slate-200'}">
-                            ${isToday && trained ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4"><path d="M20 6 9 17l-5-5"/></svg>' : ''}
-                        </button>
-                        <span class="font-semibold text-sm ${isToday && trained ? 'text-slate-400 line-through' : 'text-slate-700'}">${day}</span>
-                    </div>
-                    ${isToday ? '<span class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Hoje</span>' : ''}
-                `;
-                list.appendChild(div);
-            });
-             drawCalendar(); // Adicione isso aqui no final
-        }
-
-        document.addEventListener('DOMContentLoaded', render);
-    </script>
-</body>
-</html>
+            <svg
