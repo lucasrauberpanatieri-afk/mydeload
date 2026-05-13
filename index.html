@@ -6,26 +6,32 @@
     <title>MyDeload</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Garante que o conteúdo não fique escondido atrás da navegação */
+        body { padding-bottom: 90px; background-color: #f8fafc; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .nav-item.active { color: #2563eb !important; }
+        /* Toque suave na transição das abas */
+        .nav-item { transition: all 0.2s; }
+        .nav-item.active { color: #2563eb; }
     </style>
 </head>
-<body class="bg-slate-50 pb-24">
+<body>
 
     <div id="tab-ciclo" class="tab-content active p-6 max-w-md mx-auto">
         <h1 class="text-3xl font-black text-slate-900 mb-6">Meu Ciclo</h1>
         <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-            <span id="week-tag" class="text-xs font-bold uppercase px-2 py-1 bg-blue-100 text-blue-700 rounded text-center inline-block mb-2">Carga</span>
-            <h2 id="week-title" class="text-5xl font-black mb-4 text-slate-800">Semana 1</h2>
+            <div id="week-tag-container">
+                <span id="week-tag" class="text-[10px] font-bold uppercase px-2 py-1 bg-blue-100 text-blue-700 rounded mb-2 inline-block">Carga</span>
+            </div>
+            <h2 id="week-title" class="text-5xl font-black mb-6 text-slate-800">Semana 1</h2>
             
-            <button onclick="nextWeek()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold active:scale-95 transition-transform mb-6">
+            <button onclick="nextWeek()" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold active:scale-95 transition-transform mb-8">
                 Próxima Semana
             </button>
 
             <div class="bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden">
                 <div class="p-4 border-b border-slate-200 bg-white">
-                    <h3 class="font-bold text-slate-700 text-sm">Checklist de Hoje</h3>
+                    <h3 class="font-bold text-slate-700 text-xs uppercase tracking-wider">Checklist de Hoje</h3>
                 </div>
                 <div id="days-list" class="divide-y divide-slate-100">
                     </div>
@@ -39,10 +45,10 @@
             <div class="flex justify-between items-center mb-6">
                 <h3 id="month-name" class="font-bold text-slate-800 capitalize">Mês</h3>
                 <div class="flex gap-2">
-                    <button onclick="changeMonth(-1)" class="p-2 bg-slate-50 rounded-xl text-slate-400 hover:text-slate-600">
+                    <button onclick="changeMonth(-1)" class="p-2 bg-slate-50 rounded-xl text-slate-400">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
                     </button>
-                    <button onclick="changeMonth(1)" class="p-2 bg-slate-50 rounded-xl text-slate-400 hover:text-slate-600">
+                    <button onclick="changeMonth(1)" class="p-2 bg-slate-50 rounded-xl text-slate-400">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                     </button>
                 </div>
@@ -52,17 +58,16 @@
                 <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
             </div>
 
-            <div id="calendar-grid" class="grid grid-cols-7 gap-1">
-                </div>
+            <div id="calendar-grid" class="grid grid-cols-7 gap-1"></div>
             
             <div class="mt-8 pt-6 border-t border-slate-50 flex justify-center gap-6">
                 <div class="flex items-center gap-2">
-                    <div class="w-3 h-3 bg-blue-600 rounded-full shadow-[0_0_10px_rgba(37,99,235,0.4)]"></div>
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Carga</span>
+                    <div class="w-3 h-3 bg-blue-600 rounded-full"></div>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Carga</span>
                 </div>
                 <div class="flex items-center gap-2">
-                    <div class="w-3 h-3 bg-amber-500 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.4)]"></div>
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Deload</span>
+                    <div class="w-3 h-3 bg-amber-500 rounded-full"></div>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Deload</span>
                 </div>
             </div>
         </div>
@@ -70,11 +75,11 @@
 
     <div id="tab-ajustes" class="tab-content p-6 max-w-md mx-auto">
         <h1 class="text-3xl font-black text-slate-900 mb-6">Ajustes</h1>
-        <div class="space-y-4">
-            <div class="bg-white rounded-2xl p-4 border border-slate-100 flex items-center justify-between shadow-sm">
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 space-y-6">
+            <div class="flex items-center justify-between">
                 <div>
-                    <h4 class="font-bold text-sm">Semanas de Carga</h4>
-                    <p class="text-[10px] text-slate-500 uppercase font-bold">Antes do Deload</p>
+                    <h4 class="font-bold text-slate-800 text-sm">Semanas de Carga</h4>
+                    <p class="text-[10px] text-slate-500 uppercase font-bold">Duração do ciclo</p>
                 </div>
                 <select onchange="updateRatio(this.value)" id="ratio-select" class="bg-slate-50 border-none rounded-xl p-2 text-sm font-bold text-blue-600 outline-none">
                     <option value="2">2 semanas</option>
@@ -82,21 +87,167 @@
                     <option value="4">4 semanas</option>
                     <option value="5">5 semanas</option>
                     <option value="6">6 semanas</option>
-                    <option value="7">7 semanas</option>
-                    <option value="8">8 semanas</option>
                 </select>
             </div>
-
-            <button onclick="resetApp()" class="w-full py-4 bg-red-50 text-red-600 rounded-2xl font-bold border border-red-100 active:scale-95 transition-transform">
-                Resetar Ciclo Total
+            <button onclick="resetApp()" class="w-full py-4 bg-red-50 text-red-600 rounded-2xl font-bold border border-red-100 active:scale-95 transition-all">
+                Resetar Dados
             </button>
         </div>
     </div>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 h-20 flex justify-around items-center z-50">
-        <button onclick="switchTab('ciclo')" id="nav-ciclo" class="nav-item active flex flex-col items-center gap-1">
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-slate-100 h-20 flex justify-around items-center z-50">
+        <button onclick="switchTab('ciclo')" id="nav-ciclo" class="nav-item active flex flex-col items-center gap-1 text-slate-400">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
             <span class="text-[9px] font-bold uppercase">Ciclo</span>
         </button>
-        <button onclick="switchTab('historico')" id="nav-historico" class="nav-item text-slate-400 flex flex-col items-center gap-1">
-            <svg
+        <button onclick="switchTab('historico')" id="nav-historico" class="nav-item flex flex-col items-center gap-1 text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span class="text-[9px] font-bold uppercase">Histórico</span>
+        </button>
+        <button onclick="switchTab('ajustes')" id="nav-ajustes" class="nav-item flex flex-col items-center gap-1 text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span class="text-[9px] font-bold uppercase">Ajustes</span>
+        </button>
+    </nav>
+
+    <script>
+        // ESTADO INICIAL
+        let state = JSON.parse(localStorage.getItem('mydeload_v2')) || {
+            currentWeek: 1,
+            deloadRatio: 4,
+            history: {}
+        };
+
+        // TROCA DE ABAS
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active', 'text-blue-600'));
+            
+            document.getElementById('tab-' + tabId).classList.add('active');
+            document.getElementById('nav-' + tabId).classList.add('active', 'text-blue-600');
+        }
+
+        // LÓGICA DO CICLO
+        function nextWeek() {
+            state.currentWeek++;
+            if (state.currentWeek > (state.deloadRatio + 1)) state.currentWeek = 1;
+            save();
+        }
+
+        function updateRatio(val) {
+            state.deloadRatio = parseInt(val);
+            save();
+        }
+
+        function toggleToday() {
+            const now = new Date();
+            const key = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+            if (state.history[key]) {
+                delete state.history[key];
+            } else {
+                state.history[key] = state.currentWeek;
+            }
+            save();
+        }
+
+        function resetApp() {
+            if(confirm("Deseja apagar todo o histórico e voltar à semana 1?")) {
+                state.currentWeek = 1;
+                state.history = {};
+                save();
+            }
+        }
+
+        function save() {
+            localStorage.setItem('mydeload_v2', JSON.stringify(state));
+            render();
+        }
+
+        // CALENDÁRIO
+        let currentViewDate = new Date();
+        function changeMonth(dir) {
+            currentViewDate.setMonth(currentViewDate.getMonth() + dir);
+            render();
+        }
+
+        function drawCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            const monthName = document.getElementById('month-name');
+            if (!grid) return;
+
+            const year = currentViewDate.getFullYear();
+            const month = currentViewDate.getMonth();
+            monthName.innerText = new Intl.DateTimeFormat('pt-br', { month: 'long', year: 'numeric' }).format(currentViewDate);
+
+            grid.innerHTML = '';
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) grid.appendChild(document.createElement('div'));
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dayDiv = document.createElement('div');
+                const dateKey = `${year}-${month}-${d}`;
+                const trainedInWeek = state.history[dateKey];
+
+                dayDiv.className = `aspect-square flex items-center justify-center text-[11px] font-bold rounded-xl transition-all`;
+                dayDiv.innerText = d;
+
+                if (trainedInWeek) {
+                    const wasDeload = trainedInWeek > state.deloadRatio;
+                    dayDiv.className += wasDeload ? ' bg-amber-500 text-white shadow-sm' : ' bg-blue-600 text-white shadow-sm';
+                } else {
+                    dayDiv.className += ' text-slate-400 hover:bg-slate-50';
+                }
+                grid.appendChild(dayDiv);
+            }
+        }
+
+        // RENDERIZAÇÃO GERAL
+        function render() {
+            const isDeload = state.currentWeek > state.deloadRatio;
+            
+            // Atualiza Título e Tag
+            document.getElementById('week-title').innerText = "Semana " + state.currentWeek;
+            const tag = document.getElementById('week-tag');
+            tag.innerText = isDeload ? "Deload" : "Carga";
+            tag.className = isDeload ? 
+                "text-[10px] font-bold uppercase px-2 py-1 bg-amber-100 text-amber-700 rounded mb-2 inline-block" : 
+                "text-[10px] font-bold uppercase px-2 py-1 bg-blue-100 text-blue-700 rounded mb-2 inline-block";
+
+            // Atualiza Select
+            document.getElementById('ratio-select').value = state.deloadRatio;
+
+            // Checklist
+            const list = document.getElementById('days-list');
+            const days = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+            const now = new Date();
+            const todayIdx = (now.getDay() + 6) % 7;
+            const key = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+            const trained = state.history[key];
+
+            list.innerHTML = '';
+            days.forEach((day, i) => {
+                const isToday = i === todayIdx;
+                const div = document.createElement('div');
+                div.className = `flex items-center justify-between p-4 ${!isToday ? 'opacity-30' : ''}`;
+                const color = isDeload ? 'bg-amber-500' : 'bg-blue-600';
+                
+                div.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <button onclick="${isToday ? 'toggleToday()' : ''}" class="w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${isToday && trained ? color + ' border-transparent' : 'border-slate-200'}">
+                            ${isToday && trained ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4"><path d="M20 6 9 17l-5-5"/></svg>' : ''}
+                        </button>
+                        <span class="font-semibold text-sm ${isToday && trained ? 'text-slate-300 line-through' : 'text-slate-700'}">${day}</span>
+                    </div>
+                    ${isToday ? '<span class="text-[9px] font-black text-blue-600 uppercase tracking-tighter">Hoje</span>' : ''}
+                `;
+                list.appendChild(div);
+            });
+            drawCalendar();
+        }
+
+        document.addEventListener('DOMContentLoaded', render);
+    </script>
+</body>
+</html>
