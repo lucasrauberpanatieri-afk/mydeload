@@ -81,12 +81,37 @@
         }
 
         // Função para avançar semana
+       // Função para avançar semana e SALVAR
         function nextWeek() {
             state.currentWeek++;
             if (state.currentWeek > (state.deloadRatio + 1)) {
                 state.currentWeek = 1;
             }
+            // Esse comando grava o dado no celular:
+            localStorage.setItem('mydeload_v2', JSON.stringify(state)); 
             updateUI();
+        }
+
+        // Atualiza a tela e também CARREGA os dados ao abrir
+        function updateUI() {
+            // Tenta carregar o que foi salvo antes
+            const saved = localStorage.getItem('mydeload_v2');
+            if (saved) {
+                state = JSON.parse(saved);
+            }
+
+            const weekTitle = document.getElementById('week-title');
+            const weekTag = document.getElementById('week-tag');
+            
+            if (weekTitle && weekTag) {
+                weekTitle.innerText = "Semana " + state.currentWeek;
+                const isDeload = state.currentWeek > state.deloadRatio;
+                
+                weekTag.innerText = isDeload ? "Deload" : "Carga";
+                weekTag.className = isDeload 
+                    ? "text-xs font-bold uppercase px-2 py-1 bg-amber-100 text-amber-700 rounded"
+                    : "text-xs font-bold uppercase px-2 py-1 bg-blue-100 text-blue-700 rounded";
+            }
         }
 
         // Função para resetar
