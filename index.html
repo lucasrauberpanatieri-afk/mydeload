@@ -219,12 +219,39 @@
         };
 
         function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active', 'text-slate-400'));
-            
-            document.getElementById('tab-' + tabId).classList.add('active');
-            document.getElementById('nav-' + tabId).classList.add('active');
-            document.querySelectorAll('.nav-item:not(.active)').forEach(n => n.classList.add('text-slate-400'));
+    // 1. Esconde todos os conteúdos das abas
+    const contents = document.querySelectorAll('.tab-content');
+    contents.forEach(content => {
+        content.classList.remove('active');
+        content.style.display = 'none'; // Garante que sumiu
+    });
+
+    // 2. Remove o destaque de todos os botões da nav
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        item.classList.remove('active', 'text-blue-600');
+        item.classList.add('text-slate-400');
+        // Se houver ícone dentro, reseta a cor dele também
+        const icon = item.querySelector('svg');
+        if(icon) icon.style.stroke = 'currentColor';
+    });
+
+    // 3. Mostra a aba clicada
+    const activeTab = document.getElementById('tab-' + tabId);
+    if (activeTab) {
+        activeTab.classList.add('active');
+        activeTab.style.display = 'block';
+    }
+
+    // 4. Destaca o botão clicado
+    const activeNav = document.getElementById('nav-' + tabId);
+    if (activeNav) {
+        activeNav.classList.add('active', 'text-blue-600');
+        activeNav.classList.remove('text-slate-400');
+        const activeIcon = activeNav.querySelector('svg');
+        if(activeIcon) activeIcon.style.stroke = '#2563eb';
+    }
+}
         }
 
         async function toggleNotifications() {
