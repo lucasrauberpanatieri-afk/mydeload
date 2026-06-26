@@ -62,17 +62,26 @@
 
     <div id="tab-ciclo" class="tab-content active p-6 max-w-md mx-auto">
         <h1 id="greeting" class="text-3xl font-black mb-6">Meu Ciclo</h1>
-        <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700 shadow-xl">
+        <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700 shadow-xl mb-6">
             <span id="week-tag" class="text-[10px] font-bold uppercase px-2 py-1 bg-blue-500/20 text-blue-400 rounded mb-2 inline-block">Carga</span>
-            <h2 id="week-title" class="text-5xl font-black mb-6">Semana 1</h2>
+            <h2 id="week-title" class="text-5xl font-black mb-2">Semana 1</h2>
             
-            <button onclick="nextWeek()" class="w-full py-4 bg-slate-50 text-slate-900 rounded-2xl font-bold active:scale-95 transition-all mb-8">
-                Próxima Semana
-            </button>
+            <p id="rpe-tip" class="text-xs text-slate-400 mb-6 italic"></p>
 
+            <div class="border-t border-slate-700/60 pt-4 mt-2">
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Registrar treino de hoje</label>
+                <div class="flex gap-2">
+                    <button onclick="setDailyPerformance('ruim')" id="perf-ruim" class="flex-1 py-3 rounded-xl bg-slate-900 text-slate-400 text-xs font-bold border border-transparent active:scale-95 transition-all">Ruim 👎</button>
+                    <button onclick="setDailyPerformance('bom')" id="perf-bom" class="flex-1 py-3 rounded-xl bg-slate-900 text-slate-400 text-xs font-bold border border-transparent active:scale-95 transition-all">Bom 👍</button>
+                    <button onclick="setDailyPerformance('excelente')" id="perf-excelente" class="flex-1 py-3 rounded-xl bg-slate-900 text-slate-400 text-xs font-bold border border-transparent active:scale-95 transition-all">Incrível 🔥</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-slate-800 p-4 rounded-3xl border border-slate-700 shadow-xl">
             <div class="bg-slate-900/50 rounded-2xl border border-slate-700 overflow-hidden">
                 <div class="p-4 border-b border-slate-700 bg-slate-800/50">
-                    <h3 class="font-bold text-slate-400 text-xs uppercase tracking-wider">Checklist</h3>
+                    <h3 class="font-bold text-slate-400 text-xs uppercase tracking-wider">Checklist Semanal</h3>
                 </div>
                 <div id="days-list" class="divide-y divide-slate-800"></div>
             </div>
@@ -99,6 +108,7 @@
     <div id="tab-ajustes" class="tab-content p-6 max-w-md mx-auto">
         <h1 class="text-3xl font-black mb-6">Ajustes</h1>
         <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700 space-y-6">
+            
             <div class="flex items-center justify-between">
                 <span class="font-bold text-sm text-slate-300">Semanas de Carga</span>
                 <select onchange="updateRatio(this.value)" id="ratio-select" class="bg-slate-900 border-none rounded-xl p-2 text-sm font-bold text-blue-400">
@@ -108,6 +118,20 @@
                     <option value="5">5 para 1</option>
                 </select>
             </div>
+
+            <div class="border-t border-slate-700/60 pt-4 space-y-3">
+                <span class="font-bold text-sm text-slate-300 block">Backup de Dados</span>
+                <div class="flex gap-2">
+                    <button onclick="exportBackup()" class="flex-1 py-2.5 bg-blue-900/30 text-blue-400 rounded-xl text-xs font-bold border border-blue-900/40">
+                        Exportar JSON
+                    </button>
+                    <label class="flex-1 py-2.5 bg-slate-700 text-slate-300 rounded-xl text-xs font-bold text-center cursor-pointer border border-slate-600">
+                        Importar JSON
+                        <input type="file" id="importFile" class="hidden" accept=".json" onchange="importBackup(event)">
+                    </label>
+                </div>
+            </div>
+
             <button onclick="resetApp()" class="w-full py-4 bg-red-900/20 text-red-400 rounded-2xl font-bold border border-red-900/30">
                 Resetar Dados
             </button>
@@ -136,13 +160,66 @@
             });
         }
 
-        let state = JSON.parse(localStorage.getItem('mydeload_v2')) || {
-            userName: "", currentWeek: 1, deloadRatio: 4, history: {}
+        // Dicas de RPE baseadas na semana ativa
+        const rpeTips = {
+            1: "Início do ciclo: Foco na técnica e execução perfeita, RPE ~7.",
+            2: "Progressão: Adicione carga ou repetições mantendo boa forma, RPE ~8.",
+            3: "Pico de Esforço: Treinos pesados e intensos. Esforço alto, RPE ~9.",
+            4: "Overreaching: Volume máximo antes do descanso. Próximo à falha, RPE ~10.",
+            5: "Deload: Recuperação ativa! Corte o volume total/peso pela metade.",
+            6: "Deload: Recuperação ativa! Corte o volume total/peso pela metade."
         };
+
+        // Estado inicial com suporte a data de início para automação
+        let state = JSON.parse(localStorage.getItem('mydeload_v2')) || {
+            userName: "", 
+            currentWeek: 1, 
+            deloadRatio: 4, 
+            cycleStartDate: null,
+            history: {} // Armazenará "YYYY-MM-DD": { weekNum: X, performance: Y }
+        };
+
+        // Função crucial para calcular automaticamente as semanas do calendário
+        function calculateAutoWeek() {
+            if (!state.cycleStartDate) {
+                const today = new Date();
+                state.cycleStartDate = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
+            }
+
+            const startParts = state.cycleStartDate.split('-');
+            const startDate = new Date(startParts[0], startParts[1], startParts[2]);
+            const todayDate = new Date();
+            todayDate.setHours(0,0,0,0);
+            startDate.setHours(0,0,0,0);
+
+            const diffTime = todayDate - startDate;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            
+            const totalWeeksInCycle = parseInt(state.deloadRatio) + 1; // Cargas + 1 de Deload
+            const rawWeeks = Math.floor(diffDays / 7) + 1;
+
+            if (rawWeeks > totalWeeksInCycle) {
+                // Reinicia ciclo automaticamente calculando a nova data âncora
+                const completedCycles = Math.floor((rawWeeks - 1) / totalWeeksInCycle);
+                startDate.setDate(startDate.getDate() + (completedCycles * totalWeeksInCycle * 7));
+                state.cycleStartDate = `${startDate.getFullYear()}-${startDate.getMonth()}-${startDate.getDate()}`;
+                state.currentWeek = ((rawWeeks - 1) % totalWeeksInCycle) + 1;
+            } else {
+                state.currentWeek = rawWeeks < 1 ? 1 : rawWeeks;
+            }
+        }
 
         function saveName() {
             const n = document.getElementById('user-name-input').value;
-            if (n.trim()) { state.userName = n; save(); document.getElementById('welcome-modal').style.display='none'; }
+            if (n.trim()) { 
+                state.userName = n; 
+                if(!state.cycleStartDate) {
+                    const today = new Date();
+                    state.cycleStartDate = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
+                }
+                save(); 
+                document.getElementById('welcome-modal').style.display='none'; 
+            }
         }
 
         function switchTab(id) {
@@ -152,17 +229,26 @@
             document.getElementById('nav-'+id).classList.add('active');
         }
 
-        function nextWeek() {
-            state.currentWeek++;
-            if (state.currentWeek > (state.deloadRatio + 1)) state.currentWeek = 1;
+        // Modifica a proporção de semanas nas configurações
+        function updateRatio(value) {
+            state.deloadRatio = parseInt(value);
+            calculateAutoWeek();
             save();
         }
 
-        function toggleToday() {
+        // Nova mecânica de registro diário por botões de rendimento
+        function setDailyPerformance(level) {
             const now = new Date();
             const key = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
-            if (state.history[key]) delete state.history[key];
-            else state.history[key] = state.currentWeek;
+            
+            if (state.history[key] && state.history[key].performance === level) {
+                delete state.history[key]; // Desmarca se clicar no mesmo botão ativo
+            } else {
+                state.history[key] = {
+                    weekNum: state.currentWeek,
+                    performance: level
+                };
+            }
             save();
         }
 
@@ -171,59 +257,145 @@
             render();
         }
 
+        // Exportar e Importar Backup
+        function exportBackup() {
+            const dataStr = JSON.stringify(state, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const filename = `mydeload-backup-${new Date().toISOString().slice(0,10)}.json`;
+            
+            const link = document.createElement('a');
+            link.setAttribute('href', dataUri);
+            link.setAttribute('download', filename);
+            link.click();
+        }
+
+        function importBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (imported.history !== undefined) {
+                        if (confirm("Isso irá substituir todos os seus dados atuais. Continuar?")) {
+                            state = imported;
+                            save();
+                            alert("Backup restaurado!");
+                        }
+                    } else { alert("Arquivo de backup inválido."); }
+                } catch(err) { alert("Erro ao processar o arquivo."); }
+            };
+            reader.readAsText(file);
+        }
+
         let currentViewDate = new Date();
         function changeMonth(dir) { currentViewDate.setMonth(currentViewDate.getMonth() + dir); render(); }
 
         function render() {
             if (!state.userName) document.getElementById('welcome-modal').style.display='flex';
+            
+            // Força a validação da proporção no input de ajustes
+            if(document.getElementById('ratio-select')) {
+                document.getElementById('ratio-select').value = state.deloadRatio || 4;
+            }
+
+            calculateAutoWeek();
+            
             const isDeload = state.currentWeek > state.deloadRatio;
             
             document.getElementById('greeting').innerText = `Olá, ${state.userName}!`;
             document.getElementById('week-title').innerText = "Semana " + state.currentWeek;
+            
             const tag = document.getElementById('week-tag');
             tag.innerText = isDeload ? "Deload" : "Carga";
             tag.className = `text-[10px] font-bold uppercase px-2 py-1 rounded mb-2 inline-block ${isDeload ? 'bg-amber-500/20 text-amber-400' : 'bg-blue-500/20 text-blue-400'}`;
 
+            // Exibir a dica de RPE adequada
+            document.getElementById('rpe-tip').innerText = rpeTips[state.currentWeek] || "Mantenha o foco.";
+
             const list = document.getElementById('days-list');
             const days = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
             const todayIdx = (new Date().getDay() + 6) % 7;
-            const key = `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDate()}`;
+            const todayKey = `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDate()}`;
             
+            // Destacar o botão de performance correto para o dia de hoje
+            const hasTrainedToday = state.history[todayKey];
+            const currentPerf = hasTrainedToday ? state.history[todayKey].performance : null;
+
+            document.getElementById('perf-ruim').className = currentPerf === 'ruim' ? "flex-1 py-3 rounded-xl bg-red-600 text-white text-xs font-bold transition-all" : "flex-1 py-3 rounded-xl bg-slate-900 text-slate-400 text-xs font-bold transition-all";
+            document.getElementById('perf-bom').className = currentPerf === 'bom' ? "flex-1 py-3 rounded-xl bg-blue-600 text-white text-xs font-bold transition-all" : "flex-1 py-3 rounded-xl bg-slate-900 text-slate-400 text-xs font-bold transition-all";
+            document.getElementById('perf-excelente').className = currentPerf === 'excelente' ? "flex-1 py-3 rounded-xl bg-green-600 text-white text-xs font-bold transition-all" : "flex-1 py-3 rounded-xl bg-slate-900 text-slate-400 text-xs font-bold transition-all";
+
             list.innerHTML = '';
             days.forEach((day, i) => {
                 const isToday = i === todayIdx;
-                const trained = state.history[key];
+                const trained = state.history[todayKey];
                 const div = document.createElement('div');
-                div.className = `flex items-center justify-between p-4 ${!isToday ? 'opacity-20' : ''}`;
+                div.className = `flex items-center justify-between p-4 ${!isToday ? 'opacity-30' : ''}`;
+                
+                // Cores dinâmicas para o check do dia atual com base no rendimento ou ciclo
+                let checkBg = 'border-slate-700';
+                if(isToday && trained) {
+                    checkBg = isDeload ? 'bg-amber-500 border-transparent text-slate-950' : 'bg-blue-500 border-transparent text-white';
+                }
+
                 div.innerHTML = `
                     <div class="flex items-center gap-3">
-                        <button onclick="${isToday ? 'toggleToday()' : ''}" class="w-6 h-6 rounded-lg border-2 flex items-center justify-center ${isToday && trained ? 'bg-blue-500 border-transparent' : 'border-slate-700'}">
+                        <div class="w-6 h-6 rounded-lg border-2 flex items-center justify-center font-black text-xs ${checkBg}">
                             ${isToday && trained ? '✓' : ''}
-                        </button>
-                        <span class="font-bold ${isToday && trained ? 'text-slate-500 line-through' : ''}">${day}</span>
+                        </div>
+                        <span class="font-bold text-sm ${isToday && trained ? 'text-slate-500 line-through' : 'text-slate-200'}">${day} ${isToday ? '<span class="text-xs text-blue-400 ml-1">(Hoje)</span>' : ''}</span>
                     </div>
                 `;
                 list.appendChild(div);
             });
 
-            // Mini Calendário
+            // Mini Calendário Dinâmico
             const grid = document.getElementById('calendar-grid');
             grid.innerHTML = '';
             const y = currentViewDate.getFullYear(), m = currentViewDate.getMonth();
-            document.getElementById('month-name').innerText = new Intl.DateTimeFormat('pt-br', {month:'long'}).format(currentViewDate);
+            document.getElementById('month-name').innerText = new Intl.DateTimeFormat('pt-br', {month:'long', year:'numeric'}).format(currentViewDate);
             const daysInM = new Date(y, m+1, 0).getDate();
-            for(let i=0; i<new Date(y,m,1).getDay(); i++) grid.appendChild(document.createElement('div'));
+            
+            let startDay = new Date(y, m, 1).getDay();
+            for(let i=0; i<startDay; i++) grid.appendChild(document.createElement('div'));
+            
             for(let d=1; d<=daysInM; d++) {
                 const day = document.createElement('div');
                 const k = `${y}-${m}-${d}`;
-                day.className = `calendar-day ${state.history[k] ? (state.history[k]>state.deloadRatio?'bg-amber-500':'bg-blue-600') : 'text-slate-600'}`;
+                const historyItem = state.history[k];
+                
+                let bgClass = 'text-slate-600 bg-slate-900/40';
+                
+                if (historyItem) {
+                    const savedWeek = historyItem.weekNum || 1;
+                    const maxRatio = state.deloadRatio || 4;
+                    if(savedWeek > maxRatio) {
+                        bgClass = 'bg-amber-500/80 text-slate-950'; // Deload no calendário
+                    } else {
+                        // Cores sutis para rendimento no calendário
+                        if(historyItem.performance === 'excelente') bgClass = 'bg-emerald-600 text-white';
+                        else if(historyItem.performance === 'ruim') bgClass = 'bg-red-500 text-white';
+                        else bgClass = 'bg-blue-600 text-white'; // Bom / Padrão
+                    }
+                }
+                
+                if(k === todayKey) {
+                    day.className = `calendar-day ${bgClass} border-2 border-blue-400`;
+                } else {
+                    day.className = `calendar-day ${bgClass}`;
+                }
+                
                 day.innerText = d;
                 grid.appendChild(day);
             }
         }
 
-        function resetApp() { if(confirm("Apagar tudo?")) { localStorage.clear(); location.reload(); } }
-        document.addEventListener('DOMContentLoaded', render);
+        function resetApp() { if(confirm("Apagar tudo e reiniciar ciclo a partir de hoje?")) { localStorage.clear(); location.reload(); } }
+        document.addEventListener('DOMContentLoaded', () => {
+            calculateAutoWeek();
+            render();
+        });
     </script>
 </body>
 </html>
