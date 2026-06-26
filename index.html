@@ -6,7 +6,7 @@
     <title>MyDeload</title>
 
     <link class="apple-touch-icon" href="icon.png">
-    <link rel="icon" type="image/png" href="icon.png">
+    <link class="icon" type="image/png" href="icon.png">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -194,13 +194,12 @@
             'excelente': 'Incrível 🔥'
         };
 
-        // Estado inicial com suporte a anotações (notes) estruturadas
         let state = JSON.parse(localStorage.getItem('mydeload_v2')) || {
             userName: "", 
             currentWeek: 1, 
             deloadRatio: 4, 
             cycleStartDate: null,
-            history: {} // Estrutura interna: "YYYY-MM-DD": { weekNum: X, performance: Y, notes: Z }
+            history: {}
         };
 
         function calculateAutoWeek() {
@@ -266,11 +265,9 @@
             const key = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
             
             if (state.history[key] && state.history[key].performance === level) {
-                // Se desmarcar o treino, remove o dia inteiro (incluindo notas)
                 delete state.history[key];
                 document.getElementById('daily-notes').value = '';
             } else {
-                // Se já existirem notas antigas criadas hoje, preserva-as
                 const existingNotes = state.history[key] ? state.history[key].notes : '';
                 state.history[key] = {
                     weekNum: state.currentWeek,
@@ -281,14 +278,12 @@
             save();
         }
 
-        // Nova função para salvar o diário de texto em tempo real
         function saveDailyNotes(text) {
             const now = new Date();
             const key = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
             
             if (state.history[key]) {
                 state.history[key].notes = text;
-                // Apenas salva no LocalStorage sem re-renderizar a tela inteira para não perder o foco do teclado
                 localStorage.setItem('mydeload_v2', JSON.stringify(state));
                 document.getElementById('char-counter').innerText = `${text.length.toLocaleString('pt-BR')} / 10.000`;
             }
@@ -299,7 +294,6 @@
             render();
         }
 
-        // Visualização de detalhes por Modal
         function openHistoryModal(dateKey, displayDate) {
             const data = state.history[dateKey];
             if (!data) return;
@@ -375,12 +369,10 @@
             const hasTrainedToday = state.history[todayKey];
             const currentPerf = hasTrainedToday ? state.history[todayKey].performance : null;
 
-            // Ativa ou desativa as classes visuais dos botões de rendimento
             document.getElementById('perf-ruim').className = currentPerf === 'ruim' ? "flex-1 py-3 rounded-xl bg-red-600 text-white text-xs font-bold transition-all" : "flex-1 py-3 rounded-xl bg-slate-900 text-slate-400 text-xs font-bold transition-all";
             document.getElementById('perf-bom').className = currentPerf === 'bom' ? "flex-1 py-3 rounded-xl bg-blue-600 text-white text-xs font-bold transition-all" : "flex-1 py-3 rounded-xl bg-slate-900 text-slate-400 text-xs font-bold transition-all";
             document.getElementById('perf-excelente').className = currentPerf === 'excelente' ? "flex-1 py-3 rounded-xl bg-green-600 text-white text-xs font-bold transition-all" : "flex-1 py-3 rounded-xl bg-slate-900 text-slate-400 text-xs font-bold transition-all";
 
-            // Controla a exibição da seção de notas (só aparece se um rendimento for selecionado hoje)
             const notesContainer = document.getElementById('notes-container');
             const dailyNotesInput = document.getElementById('daily-notes');
             if (hasTrainedToday) {
@@ -415,7 +407,6 @@
                     const savedWeek = historyItem.weekNum || 1;
                     const maxRatio = state.deloadRatio || 4;
                     
-                    // Configura os gatilhos de clique para ver os detalhes salvos
                     const formattedDate = `${String(d).padStart(2, '0')}/${String(m + 1).padStart(2, '0')}/${y}`;
                     day.setAttribute('onclick', `openHistoryModal('${k}', '${formattedDate}')`);
 
@@ -428,13 +419,23 @@
                     }
                 }
                 
+                // Adicionado 'relative' para o posicionamento do ponto indicador
                 if(k === todayKey) {
-                    day.className = `calendar-day ${bgClass} ${extraClass} border-2 border-blue-400`;
+                    day.className = `calendar-day relative ${bgClass} ${extraClass} border-2 border-blue-400`;
                 } else {
-                    day.className = `calendar-day ${bgClass} ${extraClass}`;
+                    day.className = `calendar-day relative ${bgClass} ${extraClass}`;
                 }
                 
                 day.innerText = d;
+
+                // LOGIC: Cria o pequeno indicador se houver anotação salva e preenchida
+                if (historyItem && historyItem.notes && historyItem.notes.trim() !== '') {
+                    const dot = document.createElement('span');
+                    // bg-current herda automaticamente a cor do texto do container (branco ou preto)
+                    dot.className = 'absolute top-1 right-1 w-1 h-1 bg-current rounded-full opacity-80';
+                    day.appendChild(dot);
+                }
+                
                 grid.appendChild(day);
             }
         }
